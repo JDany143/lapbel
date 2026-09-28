@@ -1,31 +1,53 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
-export default function Laporan() {
+type Laporan = {
+  id: number;
+  materi: string;
+  catatan: string;
+  created_at: string;
+};
+
+export default function LaporanPage() {
   const [materi, setMateri] = useState("");
   const [catatan, setCatatan] = useState("");
+  const [laporanList, setLaporanList] = useState<Laporan[]>([]);
 
-  const [laporanList, setLaporanList] = useState<
-    {
-      materi: string;
-      catatan: string;
-    }[]
-  >([]);
+  async function loadLaporan() {
+    try {
+      const res = await fetch("/api/laporan");
+      const data = await res.json();
+      setLaporanList(data);
+    } catch (err) {
+      console.error(err);
+    }
+  }
 
-  const simpanLaporan = () => {
+  useEffect(() => {
+    loadLaporan();
+  }, []);
+
+  async function simpanLaporan() {
     if (!materi || !catatan) return;
 
-    const laporanBaru = {
-      materi,
-      catatan,
-    };
+    const res = await fetch("/api/laporan", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        materi,
+        catatan,
+      }),
+    });
 
-    setLaporanList([...laporanList, laporanBaru]);
-
-    setMateri("");
-    setCatatan("");
-  };
+    if (res.ok) {
+      setMateri("");
+      setCatatan("");
+      loadLaporan();
+    }
+  }
 
   return (
     <main className="min-h-screen p-8">
@@ -62,9 +84,9 @@ export default function Laporan() {
           Riwayat Laporan
         </h2>
 
-        {laporanList.map((laporan, index) => (
+        {laporanList.map((laporan) => (
           <div
-            key={index}
+            key={laporan.id}
             className="border rounded p-4 mb-4"
           >
             <h3 className="font-bold">
@@ -72,6 +94,12 @@ export default function Laporan() {
             </h3>
 
             <p>{laporan.catatan}</p>
+
+            <small>
+              {new Date(
+                laporan.created_at
+              ).toLocaleString()}
+            </small>
           </div>
         ))}
       </div>
