@@ -19,8 +19,8 @@ export default function LaporanPage() {
       const res = await fetch("/api/laporan");
       const data = await res.json();
       setLaporanList(data);
-    } catch (err) {
-      console.error(err);
+    } catch (error) {
+      console.error(error);
     }
   }
 
@@ -31,21 +31,28 @@ export default function LaporanPage() {
   async function simpanLaporan() {
     if (!materi || !catatan) return;
 
-    const res = await fetch("/api/laporan", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        materi,
-        catatan,
-      }),
-    });
+    try {
+      const res = await fetch("/api/laporan", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          materi,
+          catatan,
+        }),
+      });
 
-    if (res.ok) {
+      if (!res.ok) {
+        throw new Error("Gagal menyimpan");
+      }
+
       setMateri("");
       setCatatan("");
+
       loadLaporan();
+    } catch (error) {
+      console.error(error);
     }
   }
 
@@ -61,26 +68,26 @@ export default function LaporanPage() {
           placeholder="Materi yang dipelajari"
           value={materi}
           onChange={(e) => setMateri(e.target.value)}
-          className="border rounded p-3"
+          className="border p-3 rounded"
         />
 
         <textarea
-          placeholder="Catatan belajar hari ini..."
+          placeholder="Catatan belajar hari ini"
           value={catatan}
           onChange={(e) => setCatatan(e.target.value)}
-          className="border rounded p-3 h-40"
+          className="border p-3 rounded h-40"
         />
 
         <button
           onClick={simpanLaporan}
-          className="border rounded p-3"
+          className="border p-3 rounded"
         >
           Simpan Laporan
         </button>
       </div>
 
       <div className="mt-8">
-        <h2 className="text-2xl font-semibold mb-4">
+        <h2 className="text-2xl font-bold mb-4">
           Riwayat Laporan
         </h2>
 
