@@ -1,0 +1,6 @@
+name = "lapbel"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "lapbel-db"
+database_id = "a60af04c-9625-484e-a247-aaaefc5d802e"
