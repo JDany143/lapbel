@@ -17,8 +17,9 @@ export default function QuizPage() {
   const [selected, setSelected] = useState("");
   const [score, setScore] = useState(0);
   const [loading, setLoading] = useState(false);
-
+  
   async function buatQuiz() {
+    
     if (!materi) return;
 
     setLoading(true);
