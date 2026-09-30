@@ -17,7 +17,24 @@ export default function QuizPage() {
   const [selected, setSelected] = useState("");
   const [score, setScore] = useState(0);
   const [loading, setLoading] = useState(false);
-  
+
+  async function simpanHasil(finalScore: number) {
+    try {
+      await fetch("/api/quiz-history", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          score: finalScore,
+          total: quiz.length,
+        }),
+      });
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
   async function buatQuiz() {
     
     if (!materi) return;
@@ -50,21 +67,29 @@ export default function QuizPage() {
     setLoading(false);
   }
 
-  function nextQuestion() {
-    const soal = quiz[current];
+  async function nextQuestion() {
+  const soal = quiz[current];
 
-    if (selected === soal.jawaban) {
-      setScore((s) => s + 1);
-    }
+  const isCorrect =
+    selected === soal.jawaban;
 
-    setSelected("");
+  const finalScore = isCorrect
+    ? score + 1
+    : score;
 
-    if (current < quiz.length - 1) {
-      setCurrent((c) => c + 1);
-    } else {
-      setCurrent(quiz.length);
-    }
+  if (isCorrect) {
+    setScore(finalScore);
   }
+
+  setSelected("");
+
+  if (current < quiz.length - 1) {
+    setCurrent((c) => c + 1);
+  } else {
+    await simpanHasil(finalScore);
+    setCurrent(quiz.length);
+  }
+}
 
   if (quiz.length > 0 && current >= quiz.length) {
     return (
