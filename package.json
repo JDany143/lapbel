@@ -10,9 +10,11 @@
   },
   "dependencies": {
     "@cloudflare/workers-types": "^5.20260928.1",
+    "katex": "^0.18.9",
     "next": "16.3.6",
     "react": "19.2.8",
-    "react-dom": "19.2.8"
+    "react-dom": "19.2.8",
+    "react-katex": "^3.1.0"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
