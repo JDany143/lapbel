@@ -57,6 +57,7 @@ export default function QuizPage() {
       if (data.success) {
         setQuiz(data.quiz);
         setCurrent(0);
+        setSelected("");
         setScore(0);
         setSelected("");
       }
@@ -91,6 +92,20 @@ export default function QuizPage() {
   }
 }
 
+const percent =
+  quiz.length > 0
+    ? Math.round(
+        (score / quiz.length) * 100
+      )
+    : 0;
+
+let grade = "Perlu Belajar";
+
+if (percent >= 80) {
+  grade = "Sangat Baik";
+} else if (percent >= 60) {
+  grade = "Baik";
+}
   if (quiz.length > 0 && current >= quiz.length) {
     return (
       <main className="min-h-screen bg-slate-950 text-white flex items-center justify-center p-8">
@@ -107,8 +122,16 @@ export default function QuizPage() {
           </h2>
 
           <p className="text-xl mt-6 text-slate-300">
-            {score} dari {quiz.length} jawaban benar
-          </p>
+  {score} dari {quiz.length} jawaban benar
+</p>
+
+<p className="text-cyan-300 text-2xl font-bold mt-4">
+  {grade}
+</p>
+
+<p className="text-slate-400 mt-2">
+  Persentase nilai: {percent}%
+</p>
 
           <button
             onClick={() => {
@@ -135,6 +158,9 @@ export default function QuizPage() {
         <h1 className="text-5xl font-black text-center mb-10">
           AI Quiz Generator
         </h1>
+        <p className="text-center text-slate-400 mb-10">
+  Buat soal otomatis dari materi belajar
+</p>
 
         {quiz.length === 0 && (
           <div className="bg-slate-900 rounded-3xl p-8 shadow-2xl">
@@ -144,7 +170,19 @@ export default function QuizPage() {
               onChange={(e) =>
                 setMateri(e.target.value)
               }
-              className="w-full h-48 bg-slate-800 border border-slate-700 rounded-2xl p-4 text-white"
+              className="
+w-full
+h-56
+bg-slate-800
+border
+border-slate-700
+rounded-2xl
+p-5
+text-white
+focus:outline-none
+focus:border-cyan-500
+transition
+"
               placeholder="Masukkan materi..."
             />
 
@@ -164,7 +202,28 @@ export default function QuizPage() {
         {quiz.length > 0 && current < quiz.length && (
           <div className="max-w-4xl mx-auto bg-slate-900 rounded-3xl shadow-2xl p-8">
 
-            <div className="w-full bg-slate-700 rounded-full h-4 mb-8">
+            <div className="mb-8">
+
+  <div className="flex justify-between mb-2 text-sm text-slate-400">
+    <span>
+      Soal {current + 1} / {quiz.length}
+    </span>
+
+    <span>
+      {Math.round(
+        ((current + 1) / quiz.length) * 100
+      )}%
+    </span>
+  </div>
+
+  <div className="w-full bg-slate-700 rounded-full h-4">
+    <div
+      className="bg-gradient-to-r from-blue-500 to-cyan-400 h-4 rounded-full transition-all duration-500"
+      style={{
+        width: `${((current + 1) / quiz.length) * 100}%`,
+      }}
+    />
+  </div>
               <div
                 className="bg-gradient-to-r from-blue-500 to-cyan-400 h-4 rounded-full transition-all duration-500"
                 style={{
@@ -181,11 +240,11 @@ export default function QuizPage() {
                 </p>
               </div>
 
-              <div>
-                <p className="text-cyan-400 font-bold">
-                  Skor: {score}
-                </p>
-              </div>
+                <div className="bg-cyan-500/10 border border-cyan-500 px-4 py-2 rounded-xl">
+  <p className="text-cyan-400 font-bold">
+    Skor: {score}
+  </p>
+</div>
 
             </div>
 
@@ -234,7 +293,7 @@ export default function QuizPage() {
                       onClick={() =>
                         setSelected(opsi)
                       }
-                      className={`w-full text-lg rounded-2xl p-5 text-left border-2 transition-all duration-200 ${
+                      className={`w-full text-lg rounded-2xl p-5 text-left border-2 transition-all duration-200 active:scale-95 ${
                         selected === opsi
                           ? "bg-blue-600 border-blue-500 text-white scale-[1.02]"
                           : "bg-slate-800 border-slate-700 text-white hover:bg-slate-700 hover:border-blue-500"

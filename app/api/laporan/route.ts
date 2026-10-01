@@ -1,29 +1,94 @@
 import { NextResponse } from "next/server";
-
-let data = [
-  {
-    id: 1,
-    materi: "Matematika",
-    catatan: "Belajar SPLTV",
-    created_at: new Date().toISOString(),
-  },
-];
+import { queryD1 } from "@/lib/d1";
 
 export async function GET() {
-  return NextResponse.json(data);
+  try {
+    const result = await queryD1(
+      "SELECT * FROM laporan ORDER BY id DESC"
+    );
+
+    return NextResponse.json(
+      result.result?.[0]?.results || []
+    );
+  } catch (error) {
+    console.error(error);
+
+    return NextResponse.json(
+      { error: "Gagal mengambil laporan" },
+      { status: 500 }
+    );
+  }
 }
 
 export async function POST(req: Request) {
-  const body = await req.json();
+  try {
+    const body = await req.json();
 
-  const laporanBaru = {
-    id: data.length + 1,
-    materi: body.materi,
-    catatan: body.catatan,
-    created_at: new Date().toISOString(),
-  };
+    if (!body.materi?.trim()) {
+      return NextResponse.json(
+        { error: "Materi wajib diisi" },
+        { status: 400 }
+      );
+    }
 
-  data.push(laporanBaru);
+    if (!body.catatan?.trim()) {
+      return NextResponse.json(
+        { error: "Catatan wajib diisi" },
+        { status: 400 }
+      );
+    }
 
-  return NextResponse.json(laporanBaru);
+    await queryD1(`
+      INSERT INTO laporan (
+        materi,
+        catatan,
+        created_at
+      )
+      VALUES (
+        '${body.materi.replace(/'/g, "''")}',
+        '${body.catatan.replace(/'/g, "''")}',
+        '${new Date().toISOString()}'
+      )
+    `);
+
+    return NextResponse.json({
+      success: true,
+    });
+  } catch (error) {
+    console.error(error);
+
+    return NextResponse.json(
+      { error: "Gagal menyimpan laporan" },
+      { status: 500 }
+    );
+  }
+}
+
+export async function DELETE(req: Request) {
+  try {
+    const body = await req.json();
+
+    if (!body.id) {
+      return NextResponse.json(
+        { error: "ID wajib diisi" },
+        { status: 400 }
+      );
+    }
+
+    await queryD1(`
+      DELETE FROM laporan
+      WHERE id = ${Number(body.id)}
+    `);
+
+    return NextResponse.json({
+      success: true,
+    });
+  } catch (error) {
+    console.error(error);
+
+    return NextResponse.json(
+      { error: "Gagal menghapus laporan" },
+      { status: 500 }
+    );
+  }
 }

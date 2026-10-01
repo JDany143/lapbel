@@ -1,54 +1,22 @@
-import Link from "next/link";
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 
-export default function Home() {
-  return (
-    <main className="min-h-screen p-8">
-      <h1 className="text-4xl font-bold mb-2">
-        Laporan Belajar AI
-      </h1>
+export default async function Home() {
+  const cookieStore = await cookies();
 
-      <p className="text-gray-500 mb-8">
-        Dashboard Belajar Siswa
-      </p>
+  const admin =
+    cookieStore.get("admin-session");
 
-      <div className="grid md:grid-cols-2 gap-4 mb-8">
-        <div className="border rounded-xl p-4">
-          <h2 className="font-semibold">
-            Kehadiran
-          </h2>
-          <p className="text-2xl">90%</p>
-        </div>
+  const user =
+    cookieStore.get("user-session");
 
-        <div className="border rounded-xl p-4">
-          <h2 className="font-semibold">
-            Hari Belajar
-          </h2>
-          <p className="text-2xl">15 Hari</p>
-        </div>
-      </div>
+  if (admin) {
+    redirect("/admin/dashboard");
+  }
 
-      <div className="flex gap-4">
-        <Link
-          href="/absensi"
-          className="border rounded-lg px-4 py-2"
-        >
-          Absensi
-        </Link>
+  if (user) {
+    redirect("/user");
+  }
 
-        <Link
-          href="/laporan"
-          className="border rounded-lg px-4 py-2"
-        >
-          Laporan
-        </Link>
-
-        <Link
-          href="/quiz"
-          className="border rounded-lg px-4 py-2"
-        >
-          Quiz AI
-        </Link>
-      </div>
-    </main>
-  );
+  redirect("/login");
 }
